@@ -1,4 +1,5 @@
 import 'package:firmensms/modals/about.dart';
+import 'package:firmensms/pages/settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -37,7 +38,10 @@ class _ComposePageState extends State<ComposePage> {
             ),
             IconButton(
                 onPressed: () {
-
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SettingsPage()),
+                  );
                 },
                 icon: const Icon(Icons.settings)
             )
