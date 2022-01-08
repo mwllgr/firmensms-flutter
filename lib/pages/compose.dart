@@ -1,3 +1,4 @@
+import 'package:firmensms/modals/about.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,6 +25,23 @@ class _ComposePageState extends State<ComposePage> {
         appBar: AppBar(
           title: const Text("Firmensms"),
           systemOverlayStyle: SystemUiOverlayStyle.light,
+          actions: [
+            IconButton(
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) { return const AboutModal(); }
+                  );
+                },
+                icon: const Icon(Icons.info_outline)
+            ),
+            IconButton(
+                onPressed: () {
+
+                },
+                icon: const Icon(Icons.settings)
+            )
+          ],
         ),
         body: SingleChildScrollView(
             child: Column(children: [
