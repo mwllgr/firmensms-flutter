@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:firmensms/modals/about.dart';
+import 'package:firmensms/modals/send.dart';
 import 'package:firmensms/pages/settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +24,6 @@ class _ComposePageState extends State<ComposePage> {
 
   @override
   Widget build(BuildContext context) {
-    // Build a Form widget using the _formKey created above.
     return Scaffold(
         appBar: AppBar(
           title: const Text("Firmensms"),
@@ -31,20 +33,20 @@ class _ComposePageState extends State<ComposePage> {
                 onPressed: () {
                   showDialog(
                       context: context,
-                      builder: (BuildContext context) { return const AboutModal(); }
-                  );
+                      builder: (BuildContext context) {
+                        return const AboutModal();
+                      });
                 },
-                icon: const Icon(Icons.info_outline)
-            ),
+                icon: const Icon(Icons.info_outline)),
             IconButton(
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const SettingsPage()),
+                    MaterialPageRoute(
+                        builder: (context) => const SettingsPage()),
                   );
                 },
-                icon: const Icon(Icons.settings)
-            )
+                icon: const Icon(Icons.settings))
           ],
         ),
         body: SingleChildScrollView(
@@ -56,20 +58,19 @@ class _ComposePageState extends State<ComposePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.fromLTRB(15, 15, 15, 7),
-                  child: FormBuilderTextField(
-                    name: 'senderid',
-                    maxLength: 17,
-                    decoration: InputDecoration(
-                        suffixIcon: IconButton(
-                          onPressed: () => {openContactFrom()},
-                          icon: const Icon(Icons.contacts),
-                        ),
-                      counter: SizedBox.shrink(),
-                      labelText: 'Absenderkennung',
-                        border: const OutlineInputBorder(),
-                    )
-                )),
+                    padding: const EdgeInsets.fromLTRB(15, 15, 15, 7),
+                    child: FormBuilderTextField(
+                        name: 'senderid',
+                        maxLength: 17,
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            onPressed: () => {openContactFrom()},
+                            icon: const Icon(Icons.contacts),
+                          ),
+                          counter: SizedBox.shrink(),
+                          labelText: 'Absenderkennung',
+                          border: const OutlineInputBorder(),
+                        ))),
                 Container(
                     padding: const EdgeInsets.fromLTRB(15, 15, 15, 7),
                     child: FormBuilderTextField(
@@ -84,8 +85,9 @@ class _ComposePageState extends State<ComposePage> {
                           labelText: 'Empfänger',
                           border: const OutlineInputBorder(),
                         ),
-                        validator: FormBuilderValidators.required(context, errorText: "Feld darf nicht leer sein")
-                    )),
+                        keyboardType: TextInputType.phone,
+                        validator: FormBuilderValidators.required(context,
+                            errorText: "Feld darf nicht leer sein"))),
                 Container(
                     padding: const EdgeInsets.fromLTRB(15, 15, 15, 7),
                     child: Row(
@@ -95,7 +97,7 @@ class _ComposePageState extends State<ComposePage> {
                                 padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
                                 child: FormBuilderDropdown(
                                     name: 'route',
-                                    initialValue: "5 (EUR 0,075)",
+                                    initialValue: "5",
                                     decoration: const InputDecoration(
                                         border: OutlineInputBorder(),
                                         labelText: 'Route',
@@ -107,32 +109,29 @@ class _ComposePageState extends State<ComposePage> {
                                     ].map<DropdownMenuItem<String>>(
                                         (String value) {
                                       return DropdownMenuItem<String>(
-                                        value: value,
+                                        value: value.substring(0, 1),
                                         child: Text(value),
                                       );
                                     }).toList()))),
                         Flexible(
                             child: FormBuilderDropdown(
                                 name: "type",
-                                initialValue: "Normal",
+                                initialValue: "normal",
                                 decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
                                     labelText: 'Typ',
                                     counter: SizedBox.shrink()),
-                                items: <String>[
-                                  "Normal",
-                                  "Voice",
-                                  "Flash"
-                                ].map<DropdownMenuItem<String>>((String value) {
+                                items: <String>["Normal", "Voice", "Flash"]
+                                    .map<DropdownMenuItem<String>>((String v) {
                                   return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
+                                    value: v.toLowerCase(),
+                                    child: Text(v),
                                   );
                                 }).toList()))
                       ],
                     )),
                 Container(
-                    padding: const EdgeInsets.fromLTRB(15, 15, 15, 7),
+                    padding: const EdgeInsets.fromLTRB(15, 15, 15, 15),
                     child: FormBuilderTextField(
                         name: 'text',
                         maxLength: 1000,
@@ -142,8 +141,8 @@ class _ComposePageState extends State<ComposePage> {
                           labelText: 'Nachricht',
                           border: OutlineInputBorder(),
                         ),
-                        validator: FormBuilderValidators.required(context, errorText: "Feld darf nicht leer sein")
-                    )),
+                        validator: FormBuilderValidators.required(context,
+                            errorText: "Feld darf nicht leer sein"))),
                 Row(children: [
                   Container(
                       padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
@@ -175,7 +174,16 @@ class _ComposePageState extends State<ComposePage> {
                           send();
                         },
                       ))
-                ])
+                ]),
+                Container(
+                    padding: const EdgeInsets.fromLTRB(10, 0, 15, 0),
+                    child: FormBuilderCheckbox(
+                      name: 'encoding',
+                      initialValue: false,
+                      subtitle:
+                          const Text("Auch, wenn UTF-8-Inhalte erkannt werden"),
+                      title: const Text("ISO-8859-1 erzwingen"),
+                    )),
               ],
             ),
           )
@@ -183,18 +191,108 @@ class _ComposePageState extends State<ComposePage> {
   }
 
   Future<void> openContactFrom() async {
-    final fromContact = await FlutterContactPicker.pickPhoneContact(askForPermission: true);
-    _formKey.currentState!.fields['senderid']!.didChange(fromContact.phoneNumber?.number);
+    final fromContact =
+        await FlutterContactPicker.pickPhoneContact(askForPermission: true);
+    _formKey.currentState!.fields['senderid']!
+        .didChange(fromContact.phoneNumber?.number);
   }
 
   Future<void> openContactTo() async {
-    final toContact = await FlutterContactPicker.pickPhoneContact(askForPermission: true);
-    _formKey.currentState!.fields['to']!.didChange(toContact.phoneNumber?.number);
+    final toContact =
+        await FlutterContactPicker.pickPhoneContact(askForPermission: true);
+    _formKey.currentState!.fields['to']!
+        .didChange(toContact.phoneNumber?.number);
   }
 
   void send() {
-    if (kDebugMode) {
-      print("Sending!");
+    if (_formKey.currentState!.saveAndValidate()) {
+      askSendConfirmation(context);
     }
+  }
+
+  void askSendConfirmation(BuildContext context) {
+    var data = sanitizeData();
+
+    Widget cancelButton = TextButton(
+      child: Text("Abbrechen"),
+      onPressed: () {},
+    );
+    Widget continueButton = TextButton(
+      child: Text("Senden"),
+      onPressed: () {
+        Navigator.pop(context);
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return SendModal(json: json.encode(data));
+            });
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Text("Wirklich senden?"),
+      content: Text("Soll die Nachricht wirklich gesendet werden?\n\n" +
+          (data!["senderid"].toString().isNotEmpty && data["senderid"] != null
+              ? "Absender: " + data["senderid"] + "\n"
+              : "") +
+          "Empfänger: " +
+          data["to"]),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  Map<String, dynamic>? sanitizeData() {
+    var data = Map<String, dynamic>.from(_formKey.currentState!.value);
+
+    // Encoding
+    if (data["encoding"]) {
+      data["encoding"] = "ISO-8859-1";
+    } else {
+      data["encoding"] = "auto";
+    }
+
+    // Type
+    if (data["type"] == "normal") data.remove("type");
+
+    // To
+    var to = data["to"].toString();
+    if (to.startsWith('+')) to = to.replaceFirst('+', '00');
+    if (to.startsWith('0') && !to.startsWith('00')) {
+      to = to.replaceFirst('0', '0043');
+    }
+    data["to"] = to.replaceAll(RegExp(r'[^0-9]'), '');
+
+    // From
+    if (data["senderid"] != null) {
+      var senderid = data["senderid"].toString();
+
+      if (senderid.startsWith('+')) {
+        senderid =
+            senderid.replaceFirst('+', '00').replaceAll(RegExp(r'[^0-9]'), '');
+      }
+      var noSpaces = senderid.replaceAll(' ', '');
+
+      if (noSpaces.startsWith('0') &&
+          !noSpaces.startsWith('00') &&
+          !RegExp(r'(?!^\d+$)^.+$').hasMatch(noSpaces)) {
+        senderid = noSpaces.replaceFirst('0', '0043');
+      }
+
+      data["senderid"] = senderid;
+    } else {
+      data.remove("senderid");
+    }
+
+    return data;
   }
 }
