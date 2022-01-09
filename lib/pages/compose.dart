@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:firmensms/modals/about.dart';
 import 'package:firmensms/modals/send.dart';
 import 'package:firmensms/pages/settings.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -37,7 +36,8 @@ class _ComposePageState extends State<ComposePage> {
                         return const AboutModal();
                       });
                 },
-                icon: const Icon(Icons.info_outline)),
+                tooltip: 'Über',
+                icon: const Icon(Icons.info_outline, semanticLabel: 'Über',)),
             IconButton(
                 onPressed: () {
                   Navigator.push(
@@ -46,7 +46,8 @@ class _ComposePageState extends State<ComposePage> {
                         builder: (context) => const SettingsPage()),
                   );
                 },
-                icon: const Icon(Icons.settings))
+                tooltip: 'Einstellungen',
+                icon: const Icon(Icons.settings, semanticLabel: 'Einstellungen'))
           ],
         ),
         body: SingleChildScrollView(
@@ -58,7 +59,7 @@ class _ComposePageState extends State<ComposePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                    padding: const EdgeInsets.fromLTRB(15, 15, 15, 7),
+                    padding: const EdgeInsets.fromLTRB(15, 23, 15, 7),
                     child: FormBuilderTextField(
                         name: 'senderid',
                         maxLength: 17,
@@ -67,7 +68,7 @@ class _ComposePageState extends State<ComposePage> {
                             onPressed: () => {openContactFrom()},
                             icon: const Icon(Icons.contacts),
                           ),
-                          counter: SizedBox.shrink(),
+                          counter: const SizedBox.shrink(),
                           labelText: 'Absenderkennung',
                           border: const OutlineInputBorder(),
                         ))),
@@ -81,7 +82,7 @@ class _ComposePageState extends State<ComposePage> {
                             onPressed: () => {openContactTo()},
                             icon: const Icon(Icons.contacts),
                           ),
-                          counter: SizedBox.shrink(),
+                          counter: const SizedBox.shrink(),
                           labelText: 'Empfänger',
                           border: const OutlineInputBorder(),
                         ),
@@ -214,11 +215,11 @@ class _ComposePageState extends State<ComposePage> {
     var data = sanitizeData();
 
     Widget cancelButton = TextButton(
-      child: Text("Abbrechen"),
+      child: const Text("Abbrechen"),
       onPressed: () {},
     );
     Widget continueButton = TextButton(
-      child: Text("Senden"),
+      child: const Text("Senden"),
       onPressed: () {
         Navigator.pop(context);
         showDialog(
@@ -230,7 +231,7 @@ class _ComposePageState extends State<ComposePage> {
     );
 
     AlertDialog alert = AlertDialog(
-      title: Text("Wirklich senden?"),
+      title: const Text("Wirklich senden?"),
       content: Text("Soll die Nachricht wirklich gesendet werden?\n\n" +
           (data!["senderid"].toString().isNotEmpty && data["senderid"] != null
               ? "Absender: " + data["senderid"] + "\n"
