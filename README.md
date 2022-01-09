@@ -6,3 +6,6 @@ This app uses the official REST API - documented at [https://firmensms.at/schnit
 
 ## Download
 You can download the app from the [release page](https://github.com/mwllgr/firmensms-flutter/releases).
+
+## Screenshot
+![Screenshot](https://user-images.githubusercontent.com/25794895/148666677-a6e49cc1-a59a-4f5c-a95c-937fe1a28d6e.png)
