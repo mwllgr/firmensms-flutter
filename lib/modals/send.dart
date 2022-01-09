@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 
 class SendModal extends StatelessWidget {
   const SendModal({Key? key, required this.json}) : super(key: key);
@@ -45,7 +47,7 @@ class SendModal extends StatelessWidget {
                 Padding(
                     child: Row(children: [
                       if(!snapshot.hasData && snapshot.connectionState == ConnectionState.waiting)
-                        SizedBox(
+                        const SizedBox(
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                         ),
@@ -53,10 +55,10 @@ class SendModal extends StatelessWidget {
                         width: 15,
                       ),
                       Expanded(child: Padding(
-                          padding: EdgeInsets.fromLTRB(9, 0, 0, 0),
-                          child: Text(
+                          padding: const EdgeInsets.fromLTRB(9, 0, 0, 0),
+                          child: SelectableText(
                               snapshot.connectionState == ConnectionState.waiting ? "Wird geladen..."
-                                  : snapshot.hasData ? "SMS gesendet!"
+                                  : snapshot.hasData ? "SMS gesendet!" + snapshot.data
                                   : snapshot.error.toString()
                           )))
                     ]),
@@ -78,26 +80,51 @@ class SendModal extends StatelessWidget {
     );
   }
 
-  Future<void> sendSms() async {
+  Future<String> sendSms() async {
     if(await _storage.containsKey(key: "username") && await _storage.containsKey(key: "password")) {
       final user = await _storage.read(key: "username");
       final pass = await _storage.read(key: "password");
       final auth = 'Basic ' + base64Encode(utf8.encode('$user:$pass'));
 
-      final response = await http.post(
-          Uri.parse("https://www.firmensms.at/gateway/rest/sms"),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-            'Authorization': auth
-          },
-          body: json
-      );
+      if (kDebugMode) {
+        print("Sending: " + json);
+      }
+
+      // We have to use the manual way of creating a POST request
+      // because 'http' adds "; charset=..." which doesn't work
+      // with the firmensms.at REST API
+      Request request = Request('POST', Uri.parse("https://www.firmensms.at/gateway/rest/sms"));
+      request.body = json;
+      request.headers.addAll({
+        'Content-Type': 'application/json',
+        'Authorization': auth,
+        'User-Agent': 'at.mwllgr.firmensms'
+      });
+      final streamedResponse = await request.send();
+      final response = await Response.fromStream(streamedResponse);
 
       var text = response.body;
       var body = jsonDecode(text) as Map<String, dynamic>;
+
+      if (kDebugMode) {
+        print("Received: " + text);
+      }
+
       if(body.containsKey("error")) {
-        if(body["error"] == "0") return;
-        return Future.error(ERRORS.containsKey(body["error"]) ? ERRORS[body["error"]]! : "Unbekannter Fehler: " + body["error"]);
+        if(body["error"] == "0") {
+          if(body.containsKey("balance") && body.containsKey("cost") && body.containsKey("msgid")) {
+            final balance = body["balance"];
+            final cost = body["cost"];
+            final id = body["msgid"];
+
+            return "\n\nGuthaben: $balance\nKosten: $cost\n\nID: $id";
+          }
+
+          return "";
+        }
+
+        return Future.error(ERRORS.containsKey(body["error"]) ? "F-" + body["error"] + ": " + ERRORS[body["error"]]!
+            : "Unbekannter Fehler: " + body["error"]);
       } else {
         return Future.error("Vom Server wurde eine unerwartete Antwort empfangen:\n" + text);
       }
