@@ -220,7 +220,9 @@ class _ComposePageState extends State<ComposePage> {
 
     Widget cancelButton = TextButton(
       child: const Text("Abbrechen"),
-      onPressed: () {},
+      onPressed: () {
+        Navigator.pop(context);
+      },
     );
     Widget continueButton = TextButton(
       child: const Text("Senden"),
