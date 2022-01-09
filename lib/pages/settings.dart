@@ -23,24 +23,24 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Einstellungen')),
-      body: FutureBuilder(
-        builder: (context, snapshot) {
-          if(!snapshot.hasData && snapshot.connectionState == ConnectionState.none) {
-            return SizedBox(
-              height: MediaQuery.of(context).size.height / 1.3,
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
-          }
+        appBar: AppBar(title: const Text('Einstellungen')),
+        body: FutureBuilder(
+          builder: (context, snapshot) {
+            if (!snapshot.hasData &&
+                snapshot.connectionState == ConnectionState.none) {
+              return SizedBox(
+                height: MediaQuery.of(context).size.height / 1.3,
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
 
-          if(snapshot.data != null) username = snapshot.data as String;
-          return buildSettingsList(snapshot);
-        },
-        future: getUsername(),
-      )
-    );
+            if (snapshot.data != null) username = snapshot.data as String;
+            return buildSettingsList(snapshot);
+          },
+          future: getUsername(),
+        ));
   }
 
   Widget buildSettingsList(AsyncSnapshot<Object?> snapshot) {
@@ -59,7 +59,7 @@ class _SettingsPageState extends State<SettingsPage> {
               },
             ),
             SettingsTile(
-              title: 'Passwort',
+              title: 'Passwort (Programmspezifisch)',
               subtitle: '(verborgen)',
               leading: const Icon(Icons.vpn_key),
               onPressed: (context) {
@@ -73,21 +73,17 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> askForUsername() async {
-    var username = await prompt(
-      context,
-      title: const Text("Benutzername"),
-      hintText: "Benutzername eingeben",
-      barrierDismissible: true,
-      validator: (String? value) {
-        if (value == null || value.isEmpty) {
-          return 'Feld darf nicht leer sein';
-        }
-        return null;
-      },
-      textCancel: const Text("Abbrechen")
-    );
+    var username = await prompt(context,
+        title: const Text("Benutzername"),
+        hintText: "Benutzername eingeben",
+        barrierDismissible: true, validator: (String? value) {
+      if (value == null || value.isEmpty) {
+        return 'Feld darf nicht leer sein';
+      }
+      return null;
+    }, initialValue: this.username, textCancel: const Text("Abbrechen"));
 
-    if(username != null) {
+    if (username != null) {
       _storage.write(key: "username", value: username);
       setState(() {
         this.username = username;
@@ -96,22 +92,17 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> askForPassword() async {
-    var password = await prompt(
-        context,
+    var password = await prompt(context,
         title: const Text("Passwort"),
         hintText: "Passwort eingeben",
-        barrierDismissible: true,
-        validator: (String? value) {
-          if (value == null || value.isEmpty) {
-            return 'Feld darf nicht leer sein';
-          }
-          return null;
-        },
-        obscureText: true,
-        textCancel: const Text("Abbrechen")
-    );
+        barrierDismissible: true, validator: (String? value) {
+      if (value == null || value.isEmpty) {
+        return 'Feld darf nicht leer sein';
+      }
+      return null;
+    }, obscureText: true, textCancel: const Text("Abbrechen"));
 
-    if(password != null) {
+    if (password != null) {
       _storage.write(key: "password", value: password);
     }
   }

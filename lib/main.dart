@@ -13,12 +13,8 @@ class SmsApp extends StatelessWidget {
     return MaterialApp(
       title: 'Firmensms',
       theme: ThemeData(
-          primaryTextTheme: const TextTheme(
-              headline6: TextStyle(
-                  color: Colors.white
-              )
-          )
-      ),
+          primaryTextTheme:
+              const TextTheme(headline6: TextStyle(color: Colors.white))),
       home: const ComposePage(),
     );
   }

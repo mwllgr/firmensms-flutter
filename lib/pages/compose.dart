@@ -37,7 +37,10 @@ class _ComposePageState extends State<ComposePage> {
                       });
                 },
                 tooltip: 'Über',
-                icon: const Icon(Icons.info_outline, semanticLabel: 'Über',)),
+                icon: const Icon(
+                  Icons.info_outline,
+                  semanticLabel: 'Über',
+                )),
             IconButton(
                 onPressed: () {
                   Navigator.push(
@@ -47,7 +50,8 @@ class _ComposePageState extends State<ComposePage> {
                   );
                 },
                 tooltip: 'Einstellungen',
-                icon: const Icon(Icons.settings, semanticLabel: 'Einstellungen'))
+                icon:
+                    const Icon(Icons.settings, semanticLabel: 'Einstellungen'))
           ],
         ),
         body: SingleChildScrollView(
