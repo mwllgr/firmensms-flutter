@@ -1,4 +1,4 @@
-package at.mwllgr.firmensms.firmensms
+package at.mwllgr.firmensms
 
 import io.flutter.embedding.android.FlutterActivity
 
