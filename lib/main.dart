@@ -1,6 +1,8 @@
 import 'package:firmensms/pages/compose.dart';
 import 'package:flutter/material.dart';
 
+import 'helpers/theme.dart';
+
 void main() {
   runApp(const SmsApp());
 }
@@ -12,9 +14,9 @@ class SmsApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Firmensms',
-      theme: ThemeData(
-          primaryTextTheme:
-              const TextTheme(headline6: TextStyle(color: Colors.white))),
+      themeMode: ThemeMode.system,
+      theme: ThemeClass.lightTheme,
+      darkTheme: ThemeClass.darkTheme,
       home: const ComposePage(),
     );
   }
