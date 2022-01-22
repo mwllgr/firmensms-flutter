@@ -21,7 +21,8 @@ class AboutModal extends StatelessWidget {
               padding: EdgeInsets.fromLTRB(0, 10, 0, 0)),
           const Padding(
               child: Text(
-                  'Diese Open-Source-App wurde von insComers entwickelt und ist keine offizielle App von firmensms.at.'),
+                  'Diese Open-Source-App wurde von insComers entwickelt und ist keine offizielle App von firmensms.at.\n\n'
+                      'Das firmensms-Logo bzw. die verwendete REST-Schnittstelle ist Eigentum der Missus GmbH.'),
               padding: EdgeInsets.fromLTRB(0, 15, 0, 0)),
           Padding(
               padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
