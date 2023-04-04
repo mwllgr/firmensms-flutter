@@ -183,6 +183,7 @@ class _ComposePageState extends State<ComposePage> {
                 Container(
                     padding: const EdgeInsets.fromLTRB(10, 0, 15, 0),
                     child: FormBuilderCheckbox(
+                      activeColor: Colors.blueAccent,
                       name: 'encoding',
                       initialValue: false,
                       subtitle:
