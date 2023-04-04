@@ -22,8 +22,7 @@ class SendModal extends StatelessWidget {
     '8': 'Guthaben nicht ausreichend',
     '9': 'SMS konnte nicht angenommen/gesendet werden',
     '10': 'Absenderkennung ungültig',
-    '11':
-        'SMS wurde als Spam erkannt. Im Webinterface kann die Erkennung deaktiviert werden.',
+    '11': 'SMS wurde als Spam erkannt. Im Webinterface kann die Erkennung deaktiviert werden.',
     '12': 'SMS wurde innerhalb der SMS-Pause eingeliefert',
     '13': 'SMS konnte nicht versendet werden',
     '14': 'Ungültige Empfängernummer',
@@ -46,20 +45,21 @@ class SendModal extends StatelessWidget {
               color: Colors.orange,
             ),
             const Padding(
+                padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                 child: Text('SMS-Versand',
                     style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                padding: EdgeInsets.fromLTRB(0, 10, 0, 0)),
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 20))),
             Padding(
+                padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
                 child: Row(children: [
                   if (!snapshot.hasData &&
                       snapshot.connectionState == ConnectionState.waiting)
                     const SizedBox(
+                      height: 15,
+                      width: 15,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                       ),
-                      height: 15,
-                      width: 15,
                     ),
                   Expanded(
                       child: Padding(
@@ -70,8 +70,7 @@ class SendModal extends StatelessWidget {
                               : snapshot.hasData
                                   ? "SMS gesendet!" + snapshot.data
                                   : snapshot.error.toString())))
-                ]),
-                padding: EdgeInsets.fromLTRB(0, 15, 0, 0))
+                ]))
           ]);
         },
       )),
@@ -92,10 +91,10 @@ class SendModal extends StatelessWidget {
         await _storage.containsKey(key: "password")) {
       final user = await _storage.read(key: "username");
       final pass = await _storage.read(key: "password");
-      final auth = 'Basic ' + base64Encode(utf8.encode('$user:$pass'));
+      final auth = 'Basic ${base64Encode(utf8.encode('$user:$pass'))}';
 
       if (kDebugMode) {
-        print("Sending: " + json);
+        print("Sending: $json");
       }
 
       // We have to use the manual way of creating a POST request
@@ -116,7 +115,7 @@ class SendModal extends StatelessWidget {
       var body = jsonDecode(text) as Map<String, dynamic>;
 
       if (kDebugMode) {
-        print("Received: " + text);
+        print("Received: $text");
       }
 
       if (body.containsKey("error")) {
@@ -135,11 +134,11 @@ class SendModal extends StatelessWidget {
         }
 
         return Future.error(ERRORS.containsKey(body["error"])
-            ? "F-" + body["error"] + ": " + ERRORS[body["error"]]!
+            ? "${"F-" + body["error"]}: ${ERRORS[body["error"]]!}"
             : "Unbekannter Fehler: " + body["error"]);
       } else {
         return Future.error(
-            "Vom Server wurde eine unerwartete Antwort empfangen:\n" + text);
+            "Vom Server wurde eine unerwartete Antwort empfangen:\n$text");
       }
     } else {
       return Future.error(
