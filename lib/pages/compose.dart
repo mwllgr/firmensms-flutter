@@ -91,7 +91,7 @@ class _ComposePageState extends State<ComposePage> {
                           border: const OutlineInputBorder(),
                         ),
                         keyboardType: TextInputType.phone,
-                        validator: FormBuilderValidators.required(context,
+                        validator: FormBuilderValidators.required(
                             errorText: "Feld darf nicht leer sein"))),
                 Container(
                     padding: const EdgeInsets.fromLTRB(15, 15, 15, 7),
@@ -146,7 +146,7 @@ class _ComposePageState extends State<ComposePage> {
                           labelText: 'Nachricht',
                           border: OutlineInputBorder(),
                         ),
-                        validator: FormBuilderValidators.required(context,
+                        validator: FormBuilderValidators.required(
                             errorText: "Feld darf nicht leer sein"))),
                 Row(children: [
                   Container(
@@ -155,9 +155,9 @@ class _ComposePageState extends State<ComposePage> {
                         icon: const Icon(Icons.clear),
                         label: const Text('Zurücksetzen'),
                         style: TextButton.styleFrom(
-                          primary: Colors.white,
+                          foregroundColor: Colors.white,
                           backgroundColor: Colors.redAccent,
-                          onSurface: Colors.grey,
+                          disabledForegroundColor: Colors.grey.withOpacity(0.38),
                         ),
                         onPressed: () {
                           _formKey.currentState?.reset();
@@ -171,9 +171,9 @@ class _ComposePageState extends State<ComposePage> {
                         icon: const Text('Senden'),
                         label: const Icon(Icons.send),
                         style: TextButton.styleFrom(
-                          primary: Colors.white,
+                          foregroundColor: Colors.white,
                           backgroundColor: Colors.blueAccent,
-                          onSurface: Colors.grey,
+                          disabledForegroundColor: Colors.grey.withOpacity(0.38),
                         ),
                         onPressed: () {
                           send();

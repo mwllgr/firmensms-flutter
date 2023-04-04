@@ -1,9 +1,7 @@
-import 'package:firmensms/modals/send.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_settings_ui/flutter_settings_ui.dart';
+import 'package:settings_ui/settings_ui.dart';
 import 'package:prompt_dialog/prompt_dialog.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -47,20 +45,19 @@ class _SettingsPageState extends State<SettingsPage> {
     return SettingsList(
       sections: [
         SettingsSection(
-          titlePadding: const EdgeInsets.fromLTRB(15, 15, 0, 10),
-          title: 'Authentifizierung',
+          title: Text('Authentifizierung'),
           tiles: [
             SettingsTile(
-              title: 'Benutzername',
-              subtitle: username.isNotEmpty ? username : "(noch nicht gesetzt)",
+              title: Text('Benutzername'),
+              value: Text(username.isNotEmpty ? username : "(noch nicht gesetzt)"),
               leading: const Icon(Icons.person),
               onPressed: (context) {
                 askForUsername();
               },
             ),
             SettingsTile(
-              title: 'Passwort (Programmspezifisch)',
-              subtitle: '(verborgen)',
+              title: Text('Passwort (Programmspezifisch)'),
+              value: Text('(verborgen)'),
               leading: const Icon(Icons.vpn_key),
               onPressed: (context) {
                 askForPassword();
