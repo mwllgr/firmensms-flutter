@@ -67,6 +67,11 @@ class _ComposePageState extends State<ComposePage> {
                     child: FormBuilderTextField(
                         name: 'senderid',
                         maxLength: 17,
+                        contextMenuBuilder: (context, editableTextState) {
+                          return AdaptiveTextSelectionToolbar.editableText(
+                            editableTextState: editableTextState,
+                          );
+                        },
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
                             onPressed: () => {openContactFrom()},
@@ -81,6 +86,11 @@ class _ComposePageState extends State<ComposePage> {
                     child: FormBuilderTextField(
                         name: 'to',
                         maxLength: 17,
+                        contextMenuBuilder: (context, editableTextState) {
+                          return AdaptiveTextSelectionToolbar.editableText(
+                            editableTextState: editableTextState,
+                          );
+                        },
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
                             onPressed: () => {openContactTo()},
@@ -141,6 +151,11 @@ class _ComposePageState extends State<ComposePage> {
                         name: 'text',
                         maxLength: 1000,
                         maxLines: 6,
+                        contextMenuBuilder: (context, editableTextState) {
+                          return AdaptiveTextSelectionToolbar.editableText(
+                            editableTextState: editableTextState,
+                          );
+                        },
                         decoration: const InputDecoration(
                           counter: SizedBox.shrink(),
                           labelText: 'Nachricht',
