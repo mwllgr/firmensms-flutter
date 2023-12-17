@@ -49,7 +49,7 @@ android {
 
     defaultConfig {
         applicationId "at.mwllgr.firmensms"
-        minSdkVersion 18
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion 33
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
