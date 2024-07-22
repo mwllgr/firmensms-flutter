@@ -4,7 +4,7 @@ import 'package:settings_ui/settings_ui.dart';
 import 'package:prompt_dialog/prompt_dialog.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  const SettingsPage({super.key});
 
   @override
   _SettingsPageState createState() => _SettingsPageState();
@@ -45,10 +45,10 @@ class _SettingsPageState extends State<SettingsPage> {
     return SettingsList(
       sections: [
         SettingsSection(
-          title: Text('Authentifizierung'),
+          title: const Text('Authentifizierung'),
           tiles: [
             SettingsTile(
-              title: Text('Benutzername'),
+              title: const Text('Benutzername'),
               value: Text(username.isNotEmpty ? username : "(noch nicht gesetzt)"),
               leading: const Icon(Icons.person),
               onPressed: (context) {
@@ -56,8 +56,8 @@ class _SettingsPageState extends State<SettingsPage> {
               },
             ),
             SettingsTile(
-              title: Text('Passwort (Programmspezifisch)'),
-              value: Text('(verborgen)'),
+              title: const Text('Passwort (Programmspezifisch)'),
+              value: const Text('(verborgen)'),
               leading: const Icon(Icons.vpn_key),
               onPressed: (context) {
                 askForPassword();

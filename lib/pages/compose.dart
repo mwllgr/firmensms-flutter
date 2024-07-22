@@ -6,11 +6,11 @@ import 'package:firmensms/pages/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:fluttercontactpicker/fluttercontactpicker.dart';
+import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
 class ComposePage extends StatefulWidget {
-  const ComposePage({Key? key}) : super(key: key);
+  const ComposePage({super.key});
 
   @override
   _ComposePageState createState() => _ComposePageState();
@@ -18,6 +18,8 @@ class ComposePage extends StatefulWidget {
 
 class _ComposePageState extends State<ComposePage> {
   final _formKey = GlobalKey<FormBuilderState>();
+  final FlutterContactPicker _contactPicker = FlutterContactPicker();
+
   String route = '5 (EUR 0,075)';
   String type = 'Normal';
 
@@ -213,16 +215,15 @@ class _ComposePageState extends State<ComposePage> {
 
   Future<void> openContactFrom() async {
     final fromContact =
-        await FlutterContactPicker.pickPhoneContact(askForPermission: true);
+        await _contactPicker.selectContact();
     _formKey.currentState!.fields['senderid']!
-        .didChange(fromContact.phoneNumber?.number);
+        .didChange(fromContact?.phoneNumbers?.first);
   }
 
   Future<void> openContactTo() async {
-    final toContact =
-        await FlutterContactPicker.pickPhoneContact(askForPermission: true);
+    final toContact = await _contactPicker.selectContact();
     _formKey.currentState!.fields['to']!
-        .didChange(toContact.phoneNumber?.number);
+        .didChange(toContact?.phoneNumbers?.first);
   }
 
   void send() {

@@ -8,7 +8,7 @@ void main() {
 }
 
 class SmsApp extends StatelessWidget {
-  const SmsApp({Key? key}) : super(key: key);
+  const SmsApp({super.key});
 
   @override
   Widget build(BuildContext context) {
