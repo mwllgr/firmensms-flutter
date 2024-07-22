@@ -3,11 +3,10 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
 class SendModal extends StatelessWidget {
-  const SendModal({Key? key, required this.json}) : super(key: key);
+  const SendModal({super.key, required this.json});
   final String json;
   final _storage = const FlutterSecureStorage();
 
@@ -50,7 +49,7 @@ class SendModal extends StatelessWidget {
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 20))),
             Padding(
-                padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
+                padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
                 child: Row(children: [
                   if (!snapshot.hasData &&
                       snapshot.connectionState == ConnectionState.waiting)
