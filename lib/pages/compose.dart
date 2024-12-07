@@ -18,7 +18,7 @@ class ComposePage extends StatefulWidget {
 
 class _ComposePageState extends State<ComposePage> {
   final _formKey = GlobalKey<FormBuilderState>();
-  final FlutterContactPicker _contactPicker = FlutterContactPicker();
+  final FlutterNativeContactPicker _contactPicker = FlutterNativeContactPicker();
 
   String route = '5 (EUR 0,075)';
   String type = 'Normal';
