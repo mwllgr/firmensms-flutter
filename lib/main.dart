@@ -1,9 +1,12 @@
-import 'package:firmensms/pages/compose.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:material_ui/material_ui.dart';
 
-import 'helpers/theme.dart';
+import 'app_theme.dart';
+import 'pages/compose_page.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   runApp(const SmsApp());
 }
 
@@ -16,8 +19,8 @@ class SmsApp extends StatelessWidget {
       title: 'Firmensms',
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.system,
-      theme: ThemeClass.lightTheme,
-      darkTheme: ThemeClass.darkTheme,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
       home: const ComposePage(),
     );
   }
