@@ -3,14 +3,34 @@ import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../models/history_entry.dart';
+import '../models/message_template.dart';
 import '../models/sms_message.dart';
+import '../models/sms_result.dart';
+import '../services/history_store.dart';
+import '../services/sender_id_store.dart';
+import '../services/sms_api_client.dart';
 import '../utils/phone_number.dart';
+import '../utils/template_variables.dart';
 import '../widgets/about_dialog.dart';
 import '../widgets/send_dialog.dart';
+import '../widgets/sender_id_sheet.dart';
+import '../widgets/template_variables_dialog.dart';
+import 'history_page.dart';
 import 'settings_page.dart';
+import 'templates_page.dart';
 
 class ComposePage extends StatefulWidget {
-  const ComposePage({super.key});
+  const ComposePage({
+    super.key,
+    this.client,
+    this.historyStore,
+    this.senderIdStore,
+  });
+
+  final SmsApiClient? client;
+  final HistoryStore? historyStore;
+  final SenderIdStore? senderIdStore;
 
   @override
   State<ComposePage> createState() => _ComposePageState();
@@ -27,6 +47,9 @@ class _ComposePageState extends State<ComposePage> {
 
   final _formKey = GlobalKey<FormBuilderState>();
   final _contactPicker = FlutterNativeContactPicker();
+  late final SmsApiClient _client = widget.client ?? SmsApiClient();
+  late final HistoryStore _history = widget.historyStore ?? HistoryStore();
+  late final SenderIdStore _senderIds = widget.senderIdStore ?? SenderIdStore();
 
   Future<void> _pickContact(String field) async {
     final contact = await _contactPicker.selectPhoneNumber();
@@ -34,6 +57,103 @@ class _ComposePageState extends State<ComposePage> {
         contact?.selectedPhoneNumber ?? contact?.phoneNumbers?.firstOrNull;
     if (number != null) {
       _formKey.currentState?.fields[field]?.didChange(number);
+    }
+  }
+
+  Future<void> _pickSenderId() async {
+    final current =
+        _formKey.currentState?.fields[_senderField]?.value as String?;
+    final senderId = await showSenderIdSheet(
+      context,
+      store: _senderIds,
+      current: current ?? '',
+    );
+    if (senderId != null) {
+      _formKey.currentState?.fields[_senderField]?.didChange(senderId);
+    }
+  }
+
+  Future<void> _openHistory() async {
+    final message = await Navigator.of(context).push<SmsMessage>(
+      MaterialPageRoute(builder: (context) => HistoryPage(store: _history)),
+    );
+    if (message != null) {
+      _applyMessage(message);
+    }
+  }
+
+  void _applyMessage(SmsMessage message) {
+    final fields = _formKey.currentState?.fields;
+    if (fields == null) {
+      return;
+    }
+    fields[_senderField]?.didChange(message.senderId ?? '');
+    fields[_toField]?.didChange(message.to);
+    fields[_routeField]?.didChange(message.route);
+    fields[_typeField]?.didChange(message.type);
+    fields[_textField]?.didChange(message.text);
+    fields[_encodingField]?.didChange(message.forceIso88591);
+  }
+
+  Future<SmsResult> _sendAndRecord(SmsMessage message) async {
+    final id = _history.newId();
+    final sentAt = DateTime.now();
+    try {
+      final result = await _client.send(message);
+      await _history.add(
+        HistoryEntry(
+          id: id,
+          sentAt: sentAt,
+          message: message,
+          success: true,
+          result: result,
+        ),
+      );
+      if (message.hasSenderId) {
+        await _senderIds.remember(message.senderId!);
+      }
+      return result;
+    } on SmsException catch (error) {
+      await _history.add(
+        HistoryEntry(
+          id: id,
+          sentAt: sentAt,
+          message: message,
+          success: false,
+          error: error.message,
+        ),
+      );
+      rethrow;
+    }
+  }
+
+  Future<void> _insertTemplate() async {
+    final currentText =
+        _formKey.currentState?.fields[_textField]?.value as String?;
+    final template = await Navigator.of(context).push<MessageTemplate>(
+      MaterialPageRoute(
+        builder: (context) => TemplatesPage(initialText: currentText ?? ''),
+      ),
+    );
+    if (template == null || !mounted) {
+      return;
+    }
+    var values = const <String, String>{};
+    final variables = template.variables;
+    if (variables.isNotEmpty) {
+      final entered = await showTemplateVariablesDialog(
+        context,
+        variables: variables,
+      );
+      if (entered == null) {
+        return;
+      }
+      values = entered;
+    }
+    final fields = _formKey.currentState?.fields;
+    fields?[_textField]?.didChange(renderTemplate(template.text, values));
+    if (template.hasSenderId) {
+      fields?[_senderField]?.didChange(template.senderId);
     }
   }
 
@@ -66,9 +186,10 @@ class _ComposePageState extends State<ComposePage> {
     if (confirmed != true || !mounted) {
       return;
     }
+    final result = _sendAndRecord(message);
     await showDialog<void>(
       context: context,
-      builder: (context) => SendDialog(message: message),
+      builder: (context) => SendDialog(result: result),
     );
   }
 
@@ -78,6 +199,19 @@ class _ComposePageState extends State<ComposePage> {
       appBar: AppBar(
         title: const Text('Firmensms'),
         actions: [
+          IconButton(
+            onPressed: _insertTemplate,
+            tooltip: 'Vorlagen',
+            icon: const Icon(
+              Icons.description_outlined,
+              semanticLabel: 'Vorlagen',
+            ),
+          ),
+          IconButton(
+            onPressed: _openHistory,
+            tooltip: 'Verlauf',
+            icon: const Icon(Icons.history, semanticLabel: 'Verlauf'),
+          ),
           IconButton(
             onPressed: () => showDialog<void>(
               context: context,
@@ -112,9 +246,22 @@ class _ComposePageState extends State<ComposePage> {
                     name: _senderField,
                     maxLength: 17,
                     decoration: InputDecoration(
-                      suffixIcon: IconButton(
-                        onPressed: () => _pickContact(_senderField),
-                        icon: const Icon(Icons.contacts),
+                      suffixIcon: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            onPressed: _pickSenderId,
+                            tooltip: 'Gespeicherte Absenderkennungen',
+                            icon: const Icon(
+                              Icons.arrow_drop_down_circle_outlined,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => _pickContact(_senderField),
+                            tooltip: 'Aus Kontakten',
+                            icon: const Icon(Icons.contacts),
+                          ),
+                        ],
                       ),
                       counter: const SizedBox.shrink(),
                       labelText: 'Absenderkennung',

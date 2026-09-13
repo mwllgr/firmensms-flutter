@@ -1,23 +1,11 @@
 import 'package:material_ui/material_ui.dart';
 
-import '../models/sms_message.dart';
 import '../models/sms_result.dart';
-import '../services/sms_api_client.dart';
 
-class SendDialog extends StatefulWidget {
-  const SendDialog({super.key, required this.message, this.client});
+class SendDialog extends StatelessWidget {
+  const SendDialog({super.key, required this.result});
 
-  final SmsMessage message;
-  final SmsApiClient? client;
-
-  @override
-  State<SendDialog> createState() => _SendDialogState();
-}
-
-class _SendDialogState extends State<SendDialog> {
-  late final Future<SmsResult> _result = (widget.client ?? SmsApiClient()).send(
-    widget.message,
-  );
+  final Future<SmsResult> result;
 
   String _describe(AsyncSnapshot<SmsResult> snapshot) {
     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -41,7 +29,7 @@ class _SendDialogState extends State<SendDialog> {
     return AlertDialog(
       content: SingleChildScrollView(
         child: FutureBuilder<SmsResult>(
-          future: _result,
+          future: result,
           builder: (context, snapshot) {
             final waiting = snapshot.connectionState == ConnectionState.waiting;
             return Column(

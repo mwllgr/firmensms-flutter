@@ -27,7 +27,9 @@ class _SettingsPageState extends State<SettingsPage> {
     }
     await widget.store.writeUsername(username);
     if (mounted) {
-      setState(() => _username = Future.value(username));
+      setState(() {
+        _username = Future.value(username);
+      });
     }
   }
 

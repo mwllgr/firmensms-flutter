@@ -17,12 +17,14 @@ dependencies:
   flutter_secure_storage: ^11.1.1
   http: ^1.6.0
   url_launcher: ^6.3.2
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.4
+  shared_preferences_platform_interface: ^2.4.2
 
 flutter:
   uses-material-design: true
