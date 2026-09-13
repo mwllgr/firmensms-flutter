@@ -453,9 +453,16 @@ class _ComposePageState extends State<ComposePage> {
                                   ),
                                 ]),
                               ),
+                              const SizedBox(height: 15),
                               FormBuilderSwitch(
                                 name: _autoField,
                                 initialValue: false,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  contentPadding: EdgeInsets.zero,
+                                ),
                                 title: const Text('Automatisch wiederholen'),
                                 subtitle: const Text(
                                   'Sendet die Nachricht in einem festen Abstand erneut, solange die App geöffnet ist',
@@ -464,7 +471,8 @@ class _ComposePageState extends State<ComposePage> {
                                 onChanged: (value) =>
                                     setState(() => _autoSend = value ?? false),
                               ),
-                              if (_autoSend)
+                              if (_autoSend) ...[
+                                const SizedBox(height: 15),
                                 FormBuilderTextField(
                                   name: _intervalField,
                                   initialValue: '60',
@@ -487,6 +495,7 @@ class _ComposePageState extends State<ComposePage> {
                                     ),
                                   ]),
                                 ),
+                              ],
                             ],
                           ),
                         ),
