@@ -190,7 +190,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       ),
                       _Tip(
                         icon: Icons.arrow_drop_down_circle_outlined,
-                        text: 'Verwendete Absenderkennungen werden gemerkt und lassen sich schnell wieder auswählen.',
+                        text: 'Absenderkennungen lassen sich speichern; verwendete Kennungen landen automatisch in der Absender-Historie.',
                       ),
                     ],
                   ),

@@ -50,7 +50,7 @@ void main() {
 
   group('SenderIdStore', () {
     test(
-      'keeps most recent first without duplicates and forgets entries',
+      'history keeps most recent first without duplicates and can be cleared',
       () async {
         final store = SenderIdStore(preferences: preferences);
 
@@ -59,12 +59,28 @@ void main() {
         await store.remember('Firma');
         await store.remember('   ');
 
-        expect(await store.loadAll(), ['Firma', '0043664']);
+        expect(await store.loadHistory(), ['Firma', '0043664']);
+        expect(await store.loadSaved(), isEmpty);
 
-        await store.forget('Firma');
-        expect(await store.loadAll(), ['0043664']);
+        await store.clearHistory();
+        expect(await store.loadHistory(), isEmpty);
       },
     );
+
+    test('saved entries are sorted, unique and removable', () async {
+      final store = SenderIdStore(preferences: preferences);
+
+      await store.save('Zeta');
+      await store.save('alpha');
+      await store.save('Zeta');
+      await store.save('');
+
+      expect(await store.loadSaved(), ['alpha', 'Zeta']);
+
+      await store.unsave('Zeta');
+      expect(await store.loadSaved(), ['alpha']);
+      expect(await store.loadHistory(), isEmpty);
+    });
   });
 
   group('HistoryStore', () {

@@ -82,7 +82,7 @@ void main() {
       final entries = await history.loadAll();
       expect(entries.length, 4);
       expect(entries.where((e) => e.success).length, 2);
-      expect(await senderIds.loadAll(), ['Firma']);
+      expect(await senderIds.loadHistory(), ['Firma']);
     },
   );
 
