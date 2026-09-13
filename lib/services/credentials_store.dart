@@ -18,6 +18,8 @@ class CredentialsStore {
   Future<void> writePassword(String password) =>
       _storage.write(key: _passwordKey, value: password);
 
+  Future<bool> hasCredentials() async => await read() != null;
+
   Future<Credentials?> read() async {
     final username = await _storage.read(key: _usernameKey);
     final password = await _storage.read(key: _passwordKey);

@@ -40,6 +40,15 @@ class SmsMessage {
 
   bool get hasSenderId => senderId != null && senderId!.isNotEmpty;
 
+  SmsMessage copyWith({String? to}) => SmsMessage(
+    senderId: senderId,
+    to: to ?? this.to,
+    route: route,
+    type: type,
+    text: text,
+    forceIso88591: forceIso88591,
+  );
+
   Map<String, dynamic> toJson() => <String, dynamic>{
     if (hasSenderId) 'senderid': senderId,
     'to': to,

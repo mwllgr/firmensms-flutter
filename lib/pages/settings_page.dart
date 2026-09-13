@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../services/credentials_store.dart';
 import '../widgets/text_prompt_dialog.dart';
+import 'onboarding_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key, this.store = const CredentialsStore()});
@@ -74,6 +75,20 @@ class _SettingsPageState extends State<SettingsPage> {
                   title: const Text('Passwort (Programmspezifisch)'),
                   subtitle: const Text('(verborgen)'),
                   onTap: _askForPassword,
+                ),
+                const _SectionTitle('Hilfe'),
+                ListTile(
+                  leading: const Icon(Icons.school_outlined),
+                  title: const Text('Einführung erneut anzeigen'),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      fullscreenDialog: true,
+                      builder: (context) => OnboardingPage(
+                        credentials: widget.store,
+                        onFinished: () => Navigator.of(context).pop(),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             );

@@ -117,7 +117,7 @@ void main() {
     expect(find.text('Hallo Anna'), findsWidgets);
     expect(find.textContaining('Status: gesendet'), findsOneWidget);
 
-    await tester.tap(find.text('Erneut verwenden'));
+    await tester.tap(find.text('Bearbeiten'));
     await tester.pumpAndSettle();
 
     expect(reused?.to, '00436641234567');

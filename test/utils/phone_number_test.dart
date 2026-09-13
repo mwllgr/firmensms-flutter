@@ -46,4 +46,20 @@ void main() {
       expect(normalizeSenderId('0800 Hotline'), '0800 Hotline');
     });
   });
+
+  group('parseRecipients', () {
+    test('splits on commas, semicolons and newlines and normalizes', () {
+      expect(
+        parseRecipients('+43 664 1234567, 0664 7654321;\n00491701234567'),
+        ['00436641234567', '00436647654321', '00491701234567'],
+      );
+    });
+
+    test('drops empty parts and duplicates', () {
+      expect(parseRecipients(' , 0664 1234567,,+436641234567 '), [
+        '00436641234567',
+      ]);
+      expect(parseRecipients(''), isEmpty);
+    });
+  });
 }

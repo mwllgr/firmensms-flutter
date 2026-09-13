@@ -2,12 +2,15 @@ import 'package:material_ui/material_ui.dart';
 
 import '../models/history_entry.dart';
 import '../services/history_store.dart';
+import '../services/message_sender.dart';
 import '../utils/date_format.dart';
+import '../widgets/send_progress_dialog.dart';
 
 class HistoryPage extends StatefulWidget {
-  const HistoryPage({super.key, this.store});
+  const HistoryPage({super.key, this.store, this.sender});
 
   final HistoryStore? store;
+  final MessageSender? sender;
 
   @override
   State<HistoryPage> createState() => _HistoryPageState();
@@ -15,6 +18,8 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   late final HistoryStore _store = widget.store ?? HistoryStore();
+  late final MessageSender _sender =
+      widget.sender ?? MessageSender(historyStore: _store);
   late Future<List<HistoryEntry>> _entries = _store.loadAll();
 
   Future<bool> _confirm(String title, String text) async {
@@ -62,12 +67,53 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   Future<void> _showDetails(HistoryEntry entry) async {
-    final reuse = await showDialog<bool>(
+    final action = await showDialog<_DetailAction>(
       context: context,
       builder: (context) => _HistoryDetailDialog(entry: entry),
     );
-    if (reuse == true && mounted) {
-      Navigator.of(context).pop(entry.message);
+    if (!mounted || action == null) {
+      return;
+    }
+    switch (action) {
+      case _DetailAction.reuse:
+        Navigator.of(context).pop(entry.message);
+      case _DetailAction.resend:
+        await _resend(entry);
+    }
+  }
+
+  Future<void> _resend(HistoryEntry entry) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Erneut senden?'),
+        content: Text(
+          'Soll die Nachricht erneut an ${entry.message.to} gesendet werden?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Abbrechen'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Senden'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) {
+      return;
+    }
+    await showSendProgressDialog(
+      context,
+      outcomes: _sender.sendAll([entry.message]),
+      total: 1,
+    );
+    if (mounted) {
+      setState(() {
+        _entries = _store.loadAll();
+      });
     }
   }
 
@@ -199,14 +245,20 @@ class _HistoryDetailDialog extends StatelessWidget {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
+          onPressed: () => Navigator.of(context).pop(),
           child: const Text('Schließen'),
         ),
         TextButton(
-          onPressed: () => Navigator.of(context).pop(true),
-          child: const Text('Erneut verwenden'),
+          onPressed: () => Navigator.of(context).pop(_DetailAction.reuse),
+          child: const Text('Bearbeiten'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(_DetailAction.resend),
+          child: const Text('Erneut senden'),
         ),
       ],
     );
   }
 }
+
+enum _DetailAction { reuse, resend }

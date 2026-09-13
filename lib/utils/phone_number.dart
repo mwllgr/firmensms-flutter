@@ -31,3 +31,19 @@ String? normalizeSenderId(String? raw) {
   }
   return value;
 }
+
+final RegExp _recipientSeparators = RegExp(r'[,;\n]');
+
+List<String> parseRecipients(String raw) {
+  final recipients = <String>[];
+  for (final part in raw.split(_recipientSeparators)) {
+    if (part.trim().isEmpty) {
+      continue;
+    }
+    final normalized = normalizeRecipient(part);
+    if (normalized.isNotEmpty && !recipients.contains(normalized)) {
+      recipients.add(normalized);
+    }
+  }
+  return recipients;
+}
